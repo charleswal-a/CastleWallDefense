@@ -6,15 +6,16 @@ Final Project Design Document -
         private int xCoord
         private int yCoord
 
-    Player
-        private int xCoord
-        private int yCoord
-
         public int getXCoord()
             returns value stored in xCoord instance variable
 
+
+    Player
+        private int yCoord
+
         public int getYCoord()
             returns value stored in yCoord instance variable
+
     Arrow
         private int xCoord
         private int yCoord
@@ -28,7 +29,14 @@ Final Project Design Document -
     CastleWall
         private int health
 
+        public int getHealth()
+            returns value stored in health instance variable
+
     GameWindow
+        * implements
+
+        private final int playerX =
+
     EnemyAliveSprite
     EnemyDeadSprite
     PlayerSprite
