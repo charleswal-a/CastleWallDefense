@@ -15,23 +15,29 @@ public class GameWindow extends JFrame {
 
     public GameWindow() {
         super("Game");
+        setUp();
+    }
 
+    public void setUp() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(500, 400);
         setLocation(50, 50);
         setVisible(true);
 
-        background = new ImageIcon("src/orange-fox-sprite.png").getImage();
+
+        panel = new JPanel();
+        panel.setBounds(0,0,500,400);
+        background = new ImageIcon("Background.png").getImage();
         score = new JTextArea();
+        score.setBounds(0,0,100, 25);
         wallHealth = new JTextArea();
-        Graphics Graphics = null;
-        setUpGame(Graphics);
+
+        add(wallHealth);
+        wallHealth.setText("This is the health");
     }
 
-    public void setUpGame(Graphics g) {
+    public void paint(Graphics g) {
         Graphics2D graphic_2D = (Graphics2D) g;
-        score.setBounds(0,0,100, 25);
-
-        graphic_2D.drawImage(background, 0, 0, null);
+        graphic_2D.drawImage(background, 0,0,null);
     }
 }
