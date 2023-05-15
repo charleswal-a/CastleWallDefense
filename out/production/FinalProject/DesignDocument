@@ -1,5 +1,5 @@
 Final Project Design Document -
-    GameRunner
+    Main.GameRunner
 
 
     Enemy
@@ -32,7 +32,7 @@ Final Project Design Document -
         public int getHealth()
             returns value stored in health instance variable
 
-    GameWindow
+    Main.GameWindow
         * implements
 
         private final int playerX =
