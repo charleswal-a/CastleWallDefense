@@ -1,13 +1,15 @@
-public class Enemy {
+package entity;
+
+public class Arrow {
     private int xCoord;
     private int yCoord;
 
-    public Enemy(int y) {
-        xCoord = 100;
+    public Arrow(int y) {
         yCoord = y;
+        xCoord = 10;
     }
 
-    public int getXCoord() {
+    public int getxCoord() {
         return xCoord;
     }
 
@@ -15,7 +17,7 @@ public class Enemy {
         return yCoord;
     }
 
-    public void moveForward() {
+    public void moveArrow() {
         xCoord += 5;
     }
 }

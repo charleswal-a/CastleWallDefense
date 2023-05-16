@@ -1,8 +1,8 @@
 Final Project Design Document -
-    Main.GameRunner
+    main.GameRunner
 
 
-    Enemy
+    entity.Enemy
         private int xCoord
         private int yCoord
 
@@ -10,13 +10,13 @@ Final Project Design Document -
             returns value stored in xCoord instance variable
 
 
-    Player
+    entity.Player
         private int yCoord
 
         public int getYCoord()
             returns value stored in yCoord instance variable
 
-    Arrow
+    entity.Arrow
         private int xCoord
         private int yCoord
 
@@ -32,7 +32,7 @@ Final Project Design Document -
         public int getHealth()
             returns value stored in health instance variable
 
-    GameWindow
+    main.GameWindow
         * implements
 
         private final int playerX =

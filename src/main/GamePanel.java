@@ -1,3 +1,7 @@
+package main;
+
+import entity.Player;
+
 import javax.swing.JPanel;
 import java.awt.*;
 
@@ -5,13 +9,17 @@ public class GamePanel extends JPanel implements Runnable {
     final int origTileSize = 16;
     final int height = 500;
     final int width = 500;
+    InputListener inputL = new InputListener();
+    Player p = new Player(this, inputL);
     Thread thread;
 
 
     public GamePanel() {
-        setPreferredSize(new Dimension(width, height));
-        setDoubleBuffered(true);
+        this.setPreferredSize(new Dimension(width, height));
+        this.setDoubleBuffered(true);
         this.setBackground(Color.white);
+        this.addKeyListener(inputL);
+        this.setFocusable(true);
         startThread();
     }
 
