@@ -9,6 +9,7 @@ public class GameWindow {
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameFrame.setResizable(false);
         gameFrame.setTitle("Game");
+
         gameFrame.setLocationRelativeTo(null);
         gameFrame.setVisible(true);
         gameFrame.setBounds(0,0,500,500);

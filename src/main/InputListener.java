@@ -4,17 +4,19 @@ import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
 
 public class InputListener implements KeyListener {
-    public boolean upPressed;
-    public boolean downPressed;
-    public boolean spacePressed;
+    private boolean upPressed;
+    private boolean downPressed;
+    private boolean spacePressed;
 
+    @Override
     public void keyTyped(KeyEvent e) {
 
     }
 
-    public void keyPressed(KeyEvent event) {
-        int key = event.getKeyCode();
-
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int key = e.getKeyCode();
+        System.out.println("Key has been typed");
         if (key == KeyEvent.VK_W) {
             upPressed = true;
         }
@@ -26,6 +28,7 @@ public class InputListener implements KeyListener {
         }
     }
 
+    @Override
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
 

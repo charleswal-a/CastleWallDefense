@@ -24,12 +24,7 @@ public class Player extends Entity {
     }
 
     public void update() {
-        if(inputL.isUpPressed()) {
-            setY(getY() - 5);
-        }
-        if(inputL.isDownPressed()) {
-            setY(getY() + 5);
-        }
+
     }
 
     public void draw(Graphics2D g2D) {
