@@ -12,6 +12,7 @@ public class Entity {
         this.x = x;
         this.y = y;
         this.speed = speed;
+        this.speed = 0;
     }
 
     public int getX() {
