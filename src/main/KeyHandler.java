@@ -1,9 +1,9 @@
 package main;
 
-import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
-public class InputListener implements KeyListener {
+public class KeyHandler implements KeyListener {
     private boolean upPressed;
     private boolean downPressed;
     private boolean spacePressed;
@@ -15,30 +15,30 @@ public class InputListener implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        int key = e.getKeyCode();
-        System.out.println("Key has been typed");
-        if (key == KeyEvent.VK_W) {
+        int code = e.getKeyCode();
+
+        if(code == KeyEvent.VK_W) {
             upPressed = true;
         }
-        if (key == KeyEvent.VK_S) {
+        if(code == KeyEvent.VK_S) {
             downPressed = true;
         }
-        if (key == KeyEvent.VK_SPACE) {
+        if(code == KeyEvent.VK_SPACE) {
             spacePressed = true;
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        int key = e.getKeyCode();
+        int code = e.getKeyCode();
 
-        if (key == KeyEvent.VK_W) {
+        if(code == KeyEvent.VK_W) {
             upPressed = false;
         }
-        if (key == KeyEvent.VK_S) {
+        if(code == KeyEvent.VK_S) {
             downPressed = false;
         }
-        if (key == KeyEvent.VK_SPACE) {
+        if(code == KeyEvent.VK_SPACE) {
             spacePressed = false;
         }
     }

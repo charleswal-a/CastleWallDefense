@@ -1,33 +1,31 @@
 package entity;
 
 import main.GamePanel;
-import main.InputListener;
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
+import main.KeyHandler;
 
 public class Player extends Entity {
-    GamePanel gp;
-    InputListener inputL;
+    private GamePanel gp;
+    private KeyHandler keyH;
 
-    public Player(GamePanel gp, InputListener inputL) {
-        super(30, 250);
+    public Player(int x, int y, int s, GamePanel gp, KeyHandler keyH) {
+        super(x, y, s);
         this.gp = gp;
-        this.inputL = inputL;
-
-        try {
-            setImage(ImageIO.read(getClass().getResourceAsStream("/images/Piskel.png")));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.keyH = keyH;
     }
 
     public void update() {
+        if(keyH.isUpPressed()) {
 
+        }
+        else if(keyH.isDownPressed()) {
+
+        }
+        else if(keyH.isSpacePressed()) {
+
+        }
     }
 
-    public void draw(Graphics2D g2D) {
-        g2D.drawImage(getImage(), getX(), getY(), null);
+    public void draw(){
+
     }
 }

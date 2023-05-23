@@ -1,7 +1,6 @@
 package main;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 public class GameWindow {
     public static void main(String[] args) {
@@ -10,12 +9,14 @@ public class GameWindow {
         gameFrame.setResizable(false);
         gameFrame.setTitle("Game");
 
-        gameFrame.setLocationRelativeTo(null);
-        gameFrame.setVisible(true);
-        gameFrame.setBounds(0,0,500,500);
-
-        JPanel gamePanel = new GamePanel();
+        GamePanel gamePanel = new GamePanel();
         gameFrame.add(gamePanel);
         gameFrame.pack();
+
+        gameFrame.setLocationRelativeTo(null);
+        gameFrame.setVisible(true);
+
+        gamePanel.startGameThread();
+
     }
 }

@@ -5,12 +5,13 @@ import java.awt.image.BufferedImage;
 public class Entity {
     private int x;
     private int y;
+    private int speed;
     private BufferedImage image;
 
-    public Entity(int x, int y) {
+    public Entity(int x, int y, int speed) {
         this.x = x;
         this.y = y;
-
+        this.speed = speed;
     }
 
     public int getX() {
@@ -27,6 +28,14 @@ public class Entity {
 
     public void setY(int y) {
         this.y = y;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
     }
 
     public BufferedImage getImage() {

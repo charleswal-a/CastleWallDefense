@@ -1,47 +1,52 @@
 package main;
 
 import entity.Player;
-
 import javax.swing.JPanel;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 
 public class GamePanel extends JPanel implements Runnable {
-    final int height = 500;
-    final int width = 500;
-    InputListener inputL;
-    Player p;
-    Thread gameThread;
-    int fps = 60;
+    private final int originaltileSize = 16;
+    private final int scale = 3;
+    private final int tileSize = originaltileSize * scale;
+    private final int maxScreenCol = 18;
+    private final int maxScreenRow = 12;
+    private final int screenWidth = tileSize * maxScreenCol;
+    private final int screenHeight = tileSize * maxScreenRow;
 
+    private final KeyHandler keyH = new KeyHandler();
+    private Thread gameThread;
 
-    int x = 100;
+    private Player p;
+
+    private int playerX = 100;
+    private int playerY = 100;
+    private int playerSpeed = 5;
+    private int fps = 60;
 
     public GamePanel() {
-        this.setPreferredSize(new Dimension(width, height));
-        this.setDoubleBuffered(true);
+        this.setPreferredSize(new Dimension(screenWidth, screenHeight));
         this.setBackground(Color.black);
-
-        inputL = new InputListener();
-        this.addKeyListener(inputL);
+        this.setDoubleBuffered(true);
+        this.addKeyListener(keyH);
         this.setFocusable(true);
 
-        p = new Player(this, inputL);
+        p = new Player(75, 100, playerSpeed, this, keyH);
+    }
 
+    public void startGameThread() {
         gameThread = new Thread(this);
         gameThread.start();
     }
 
-    public void startGameThread() {
-
-    }
-
-
     public void update() {
-        if(inputL.isUpPressed()) {
-            x -= 10;
+        if(keyH.isUpPressed()) {
+            playerY -= playerSpeed;
         }
-        else if(inputL.isDownPressed()) {
-            x += 10;
+        else if(keyH.isDownPressed()) {
+            playerY += playerSpeed;
         }
     }
 
@@ -51,13 +56,13 @@ public class GamePanel extends JPanel implements Runnable {
         Graphics2D graphics2D = (Graphics2D) g;
 
         graphics2D.setColor(Color.white);
-        graphics2D.fillRect(x, 100, 10,10);
+        graphics2D.fillRect(p.getX(), p.getY(), tileSize, tileSize);
         graphics2D.dispose();
     }
 
     @Override
     public void run() {
-        double drawInterval = 100000000/fps;
+        double drawInterval = 1000000000/fps;
         double nextDrawTime = System.nanoTime() + drawInterval;
 
         while (gameThread != null) {
