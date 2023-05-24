@@ -28,7 +28,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
-        this.setBackground(Color.black);
+        this.setBackground(Color.green);
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.setFocusable(true);
@@ -42,21 +42,14 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void update() {
-        if(keyH.isUpPressed()) {
-            playerY -= playerSpeed;
-        }
-        else if(keyH.isDownPressed()) {
-            playerY += playerSpeed;
-        }
+        p.update();
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
         Graphics2D graphics2D = (Graphics2D) g;
-
-        graphics2D.setColor(Color.white);
-        graphics2D.fillRect(p.getX(), p.getY(), tileSize, tileSize);
+        p.draw(graphics2D, tileSize);
         graphics2D.dispose();
     }
 
