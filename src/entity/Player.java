@@ -40,7 +40,7 @@ public class Player extends Entity {
         }
         else if(keyH.isDownPressed()) {
             direction = "down";
-            if (y < 540) {
+            if (y < 510) {
                 y += speed;
             }
         }
