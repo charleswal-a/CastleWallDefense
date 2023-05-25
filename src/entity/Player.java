@@ -46,6 +46,7 @@ public class Player extends Entity {
     }
 
 
+    //
     public void draw(Graphics2D graphics2D, int tileSize){
 //        graphics2D.setColor(Color.white);
 //        graphics2D.fillRect(x, y, tileSize, tileSize);
