@@ -31,7 +31,6 @@ public class Player extends Entity {
     }
 
     public void update() {
-
         if(keyH.isUpPressed()) {
             direction = "up";
             if (y > 30) {
@@ -43,9 +42,6 @@ public class Player extends Entity {
             if (y < 510) {
                 y += speed;
             }
-        }
-        else if(keyH.isSpacePressed()) {
-
         }
     }
 

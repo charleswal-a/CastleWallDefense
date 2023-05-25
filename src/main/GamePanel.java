@@ -1,18 +1,20 @@
 package main;
 
+import entity.Arrow;
 import entity.Player;
 import javax.swing.JPanel;
 import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 
 public class GamePanel extends JPanel implements Runnable {
     private final int originaltileSize = 16;
-    private final int scale = 3;
+    private final int scale = 9;
     private final int tileSize = originaltileSize * scale;
-    private final int maxScreenCol = 18;
-    private final int maxScreenRow = 12;
+    private final int maxScreenCol = 8;
+    private final int maxScreenRow = 5;
     private final int screenWidth = tileSize * maxScreenCol;
     private final int screenHeight = tileSize * maxScreenRow;
 
@@ -20,11 +22,10 @@ public class GamePanel extends JPanel implements Runnable {
     private Thread gameThread;
 
     private Player p;
+    private ArrayList<Arrow> arrows;
+    private int playerSpeed;
+    private int fps;
 
-    private int playerX = 100;
-    private int playerY = 100;
-    private int playerSpeed = 5;
-    private int fps = 60;
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -33,7 +34,11 @@ public class GamePanel extends JPanel implements Runnable {
         this.addKeyListener(keyH);
         this.setFocusable(true);
 
-        p = new Player(75, 100, playerSpeed, this, keyH);
+        arrows = new ArrayList<Arrow>();
+        fps = 60;
+        playerSpeed = 5;
+
+        p = new Player(30, 100, playerSpeed, this, keyH);
     }
 
     public void startGameThread() {
@@ -43,6 +48,30 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void update() {
         p.update();
+
+        if(keyH.isSpacePressed()) {
+            boolean tooClose = false;
+
+            for(Arrow a : arrows) {
+                if(a.x < p.x + 300) {
+                    tooClose = true;
+                }
+            }
+            if(!tooClose) {
+                Arrow a = new Arrow(p.x, p.y, 20);
+                arrows.add(a);
+                System.out.println(arrows);
+            }
+        }
+
+        for(int i = 0; i < arrows.size(); i++) {
+            if(arrows.get(i).x > tileSize * maxScreenCol) {
+                arrows.remove(arrows.get(i));
+            }
+            else {
+                arrows.get(i).moveForward();
+            }
+        }
     }
 
     public void paintComponent(Graphics g) {
@@ -50,6 +79,9 @@ public class GamePanel extends JPanel implements Runnable {
 
         Graphics2D graphics2D = (Graphics2D) g;
         p.draw(graphics2D, tileSize);
+        for(Arrow a : arrows) {
+            a.draw(graphics2D, tileSize);
+        }
         graphics2D.dispose();
     }
 
