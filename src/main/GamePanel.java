@@ -108,6 +108,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
         for(Enemy e : enemies) {
             e.draw(graphics2D, tileSize);
+            System.out.println();
         }
         graphics2D.dispose();
     }
