@@ -2,6 +2,7 @@ package main;
 
 import entity.Arrow;
 import entity.Player;
+import entity.Enemy;
 import javax.swing.JPanel;
 import java.awt.Dimension;
 import java.awt.Color;
@@ -10,19 +11,23 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 
 public class GamePanel extends JPanel implements Runnable {
-    private final int originaltileSize = 16;
+    private final int originalTileSize = 16;
     private final int scale = 9;
-    private final int tileSize = originaltileSize * scale;
+    private final int tileSize = originalTileSize * scale;
     private final int maxScreenCol = 8;
     private final int maxScreenRow = 5;
     private final int screenWidth = tileSize * maxScreenCol;
     private final int screenHeight = tileSize * maxScreenRow;
+    private int enemyCooldown;
+    private int frameCount;
+    private int enemySpeed;
 
     private final KeyHandler keyH = new KeyHandler();
     private Thread gameThread;
 
     private Player p;
     private ArrayList<Arrow> arrows;
+    private ArrayList<Enemy> enemies;
     private int playerSpeed;
     private int fps;
 
@@ -35,8 +40,12 @@ public class GamePanel extends JPanel implements Runnable {
         this.setFocusable(true);
 
         arrows = new ArrayList<Arrow>();
+        enemies = new ArrayList<Enemy>();
         fps = 60;
         playerSpeed = 5;
+        enemyCooldown = 120;
+        frameCount = 0;
+        enemySpeed = 5;
 
         p = new Player(30, 100, playerSpeed, this, keyH);
     }
@@ -48,6 +57,15 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void update() {
         p.update();
+        frameCount++;
+
+        if(frameCount == enemyCooldown) {
+            int x = maxScreenCol * tileSize;
+            int y = (int) (Math.random() * 650);
+            Enemy e = new Enemy (x, y, enemySpeed);
+            enemies.add(e);
+            frameCount = 0;
+        }
 
         if(keyH.isSpacePressed()) {
             boolean tooClose = false;
@@ -72,6 +90,12 @@ public class GamePanel extends JPanel implements Runnable {
                 arrows.get(i).moveForward();
             }
         }
+
+        for (int i = 0; i < enemies.size(); i++){
+            if (enemies.get(i).x + enemies.get(i).speed > 100) {
+                enemies.get(i).moveForward();
+            }
+        }
     }
 
     public void paintComponent(Graphics g) {
@@ -81,6 +105,9 @@ public class GamePanel extends JPanel implements Runnable {
         p.draw(graphics2D, tileSize);
         for(Arrow a : arrows) {
             a.draw(graphics2D, tileSize);
+        }
+        for(Enemy e : enemies) {
+            e.draw(graphics2D, tileSize);
         }
         graphics2D.dispose();
     }
@@ -93,6 +120,10 @@ public class GamePanel extends JPanel implements Runnable {
         while (gameThread != null) {
             update();
             repaint();
+
+
+
+
 
             try {
                 double remainingTime = nextDrawTime - System.nanoTime();

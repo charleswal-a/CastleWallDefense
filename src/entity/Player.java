@@ -5,7 +5,6 @@ import main.KeyHandler;
 
 import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -24,7 +23,7 @@ public class Player extends Entity {
 
     public void setPlayerImages() {
         try {
-            bowDrawn = ImageIO.read(getClass().getResourceAsStream("/Player/Player-1.png"));
+            bowDrawn = ImageIO.read(getClass().getResourceAsStream("/Player/Player-still-1.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }

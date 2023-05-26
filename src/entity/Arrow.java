@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.awt.image.BufferedImage;
 
 public class Arrow extends Entity {
-    public BufferedImage arrowImage;
+    private BufferedImage arrowImage;
     public Arrow(int x, int y, int s) {
         super(x, y, s);
         setArrowImage();
