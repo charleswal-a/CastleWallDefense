@@ -112,6 +112,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
         graphics2D.dispose();
     }
+    //
 
     @Override
     public void run() {
