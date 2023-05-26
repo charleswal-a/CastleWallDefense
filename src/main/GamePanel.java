@@ -1,5 +1,6 @@
 package main;
 
+import entity.Entity;
 import entity.Arrow;
 import entity.Player;
 import entity.Enemy;
