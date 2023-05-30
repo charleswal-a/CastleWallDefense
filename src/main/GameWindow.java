@@ -7,7 +7,7 @@ public class GameWindow {
         JFrame gameFrame = new JFrame();
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameFrame.setResizable(false);
-        gameFrame.setTitle("Game");
+        gameFrame.setTitle("Castle Wall Defense");
 
         GamePanel gamePanel = new GamePanel();
         gameFrame.add(gamePanel);

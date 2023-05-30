@@ -3,28 +3,32 @@ package main;
 import entity.Arrow;
 import entity.Player;
 import entity.Enemy;
+
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.awt.image.BufferedImage;
 
 public class GamePanel extends JPanel implements Runnable {
     private final int originalTileSize = 16;
     private final int scale = 9;
     private final int tileSize = originalTileSize * scale;
-    private final int maxScreenCol = 8;
+    private final int maxScreenCol = 9;
     private final int maxScreenRow = 5;
     private final int screenWidth = tileSize * maxScreenCol;
     private final int screenHeight = tileSize * maxScreenRow;
+    private KeyHandler keyH = new KeyHandler();
+    private BufferedImage background;
+
+    private Thread gameThread;
     private int enemyCooldown;
     private int frameCount;
     private int enemySpeed;
-
-    private final KeyHandler keyH = new KeyHandler();
-    private Thread gameThread;
-
     private Player p;
     private ArrayList<Arrow> arrows;
     private ArrayList<Enemy> enemies;
@@ -34,11 +38,13 @@ public class GamePanel extends JPanel implements Runnable {
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
-        this.setBackground(Color.green);
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.setFocusable(true);
+        setValues();
+    }
 
+    private void setValues() {
         arrows = new ArrayList<Arrow>();
         enemies = new ArrayList<Enemy>();
         fps = 60;
@@ -46,8 +52,13 @@ public class GamePanel extends JPanel implements Runnable {
         enemyCooldown = 120;
         frameCount = 0;
         enemySpeed = 5;
+        p = new Player(30, tileSize * 2, tileSize, this, keyH);
 
-        p = new Player(30, 100, playerSpeed, this, keyH);
+        try {
+            background = ImageIO.read(getClass().getResourceAsStream("/Background/Background.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void startGameThread() {
@@ -102,13 +113,13 @@ public class GamePanel extends JPanel implements Runnable {
         super.paintComponent(g);
 
         Graphics2D graphics2D = (Graphics2D) g;
+        graphics2D.drawImage(background, 0, 0, tileSize * maxScreenCol, tileSize * maxScreenRow, null);;
         p.draw(graphics2D, tileSize);
         for(Arrow a : arrows) {
             a.draw(graphics2D, tileSize);
         }
         for(Enemy e : enemies) {
-            e.draw(graphics2D, tileSize);
-            System.out.println();
+            // e.draw(graphics2D, tileSize);
         }
         graphics2D.dispose();
     }

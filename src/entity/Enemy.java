@@ -39,7 +39,7 @@ public class Enemy extends Entity {
 
         switch(state) {
             case "running":
-                if(nextImage <= 25) {
+                if(nextImage <= 20) {
                     image = running;
                     nextImage++;
                 }
@@ -61,7 +61,7 @@ public class Enemy extends Entity {
         }
         graphics2D.drawImage(image, x, y, tileSize, tileSize, null);
 
-        if (nextImage == 50) {
+        if (nextImage == 40) {
             nextImage = 1;
         }
     }
