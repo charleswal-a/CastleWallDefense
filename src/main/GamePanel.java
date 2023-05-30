@@ -6,10 +6,7 @@ import entity.Enemy;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
-import java.awt.Dimension;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.awt.image.BufferedImage;
@@ -24,6 +21,7 @@ public class GamePanel extends JPanel implements Runnable {
     private final int screenHeight = tileSize * maxScreenRow;
     private KeyHandler keyH = new KeyHandler();
     private BufferedImage background;
+    private String backgroundState;
 
     private Thread gameThread;
     private int enemyCooldown;
@@ -32,8 +30,11 @@ public class GamePanel extends JPanel implements Runnable {
     private Player p;
     private ArrayList<Arrow> arrows;
     private ArrayList<Enemy> enemies;
-    private int playerSpeed;
     private int fps;
+    private int barricadeHealth;
+    private int killCount;
+    private int killsUntilSpeedBuff;
+    private final int[] yValues = {0, 144, 288, 432, 576};
 
 
     public GamePanel() {
@@ -48,11 +49,15 @@ public class GamePanel extends JPanel implements Runnable {
         arrows = new ArrayList<Arrow>();
         enemies = new ArrayList<Enemy>();
         fps = 60;
-        playerSpeed = 5;
         enemyCooldown = 120;
         frameCount = 0;
         enemySpeed = 5;
-        p = new Player(30, tileSize * 2, tileSize, this, keyH);
+        barricadeHealth = 100;
+        killCount = 0;
+        killsUntilSpeedBuff = 10;
+        p = new Player(110, tileSize * 2, tileSize, this, keyH);
+
+        backgroundState = "title screen";
 
         try {
             background = ImageIO.read(getClass().getResourceAsStream("/Background/Background.png"));
@@ -72,8 +77,8 @@ public class GamePanel extends JPanel implements Runnable {
 
         if(frameCount == enemyCooldown) {
             int x = maxScreenCol * tileSize;
-            int y = (int) (Math.random() * 650);
-            Enemy e = new Enemy (x, y, enemySpeed);
+            int i = (int) (Math.random() * yValues.length);
+            Enemy e = new Enemy (x, yValues[i], enemySpeed);
             enemies.add(e);
             frameCount = 0;
         }
@@ -94,17 +99,51 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         for(int i = 0; i < arrows.size(); i++) {
-            if(arrows.get(i).x > tileSize * maxScreenCol) {
-                arrows.remove(arrows.get(i));
+            Arrow a = arrows.get(i);
+            if(a.x > tileSize * maxScreenCol) {
+                arrows.remove(i);
             }
             else {
-                arrows.get(i).moveForward();
+                a.moveForward();
             }
+
+            for(int k = 0; k < enemies.size(); k++) {
+                Enemy e = enemies.get(k);
+                if(a.y == e.y) {
+                    if(a.x >= e.x) {
+                        killCount++;
+                        killsUntilSpeedBuff--;
+                        enemies.remove(k);
+                        arrows.remove(i);
+                        k = enemies.size();
+                    }
+                }
+            }
+
+            if(killsUntilSpeedBuff == 0) {
+                enemySpeed += 2;
+                if (enemyCooldown != 60) {
+                    enemyCooldown -= 20;
+                }
+                for(Enemy e : enemies) {
+                    e.setSpeed(enemySpeed);
+                }
+                killsUntilSpeedBuff = 10;
+            }
+
         }
 
         for (int i = 0; i < enemies.size(); i++){
-            if (enemies.get(i).x + enemies.get(i).speed > 100) {
-                enemies.get(i).moveForward();
+            Enemy e = enemies.get(i);
+            if (e.x + e.speed > 200) {
+                e.moveForward();
+            }
+            else if (e.getState().equals("attacking") && e.getFrameCount() <= 25) {
+                if(barricadeHealth != 0) {
+                    barricadeHealth -= 10;
+                }
+                enemies.remove(i);
+                i--;
             }
         }
     }
@@ -113,17 +152,33 @@ public class GamePanel extends JPanel implements Runnable {
         super.paintComponent(g);
 
         Graphics2D graphics2D = (Graphics2D) g;
-        graphics2D.drawImage(background, 0, 0, tileSize * maxScreenCol, tileSize * maxScreenRow, null);;
-        p.draw(graphics2D, tileSize);
-        for(Arrow a : arrows) {
-            a.draw(graphics2D, tileSize);
+
+        if(backgroundState.equals("title screen")) {
+
         }
-        for(Enemy e : enemies) {
-            // e.draw(graphics2D, tileSize);
+        if(backgroundState.equals("ended")) {
+
+        }
+        if(backgroundState.equals("playing")) {
+            graphics2D.drawImage(background, 0, 0, tileSize * maxScreenCol, tileSize * maxScreenRow, null);
+            ;
+            p.draw(graphics2D, tileSize);
+            for (Arrow a : arrows) {
+                a.draw(graphics2D, tileSize);
+            }
+            for (Enemy e : enemies) {
+                e.draw(graphics2D, tileSize);
+            }
+
+            graphics2D.setColor(Color.black);
+            Font newFont = new Font("TimesRoman", Font.BOLD, 30);
+            graphics2D.setFont(newFont);
+            graphics2D.drawString("Kill Count: " + killCount, 30, 30);
+            graphics2D.drawString("Barricade Health: " + barricadeHealth + "/100", 925, 30);
         }
         graphics2D.dispose();
     }
-    //
+
 
     @Override
     public void run() {
@@ -133,10 +188,6 @@ public class GamePanel extends JPanel implements Runnable {
         while (gameThread != null) {
             update();
             repaint();
-
-
-
-
 
             try {
                 double remainingTime = nextDrawTime - System.nanoTime();

@@ -8,18 +8,18 @@ import java.awt.image.BufferedImage;
 public class Enemy extends Entity {
     private BufferedImage running, still, attacking;
     private String state;
-    private int nextImage;
+    private int frameCount;
 
     public Enemy(int x, int y, int s) {
         super(x, y, s);
         setEnemyImages();
         state = "running";
-        nextImage = 1;
+        frameCount = 1;
     }
 
     public void moveForward() {
         x -= speed;
-        if(x - speed < 100) {
+        if(x - speed < 200) {
             state = "attacking";
         }
     }
@@ -39,30 +39,42 @@ public class Enemy extends Entity {
 
         switch(state) {
             case "running":
-                if(nextImage <= 20) {
+                if(frameCount <= 20) {
                     image = running;
-                    nextImage++;
+                    frameCount++;
                 }
                 else {
                     image = still;
-                    nextImage++;
+                    frameCount++;
                 }
                 break;
             case "attacking":
-                if(nextImage <= 25) {
+                if(frameCount <= 25) {
                     image = attacking;
-                    nextImage++;
+                    frameCount++;
                 }
                 else {
                     image = still;
-                    nextImage++;
+                    frameCount++;
                 }
                 break;
         }
         graphics2D.drawImage(image, x, y, tileSize, tileSize, null);
 
-        if (nextImage == 40) {
-            nextImage = 1;
+        if (frameCount == 40) {
+            frameCount = 1;
         }
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public int getFrameCount() {
+        return frameCount;
+    }
+
+    public void setSpeed(int s) {
+        speed = s;
     }
 }
