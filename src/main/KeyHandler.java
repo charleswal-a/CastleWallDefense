@@ -7,6 +7,7 @@ public class KeyHandler implements KeyListener {
     private boolean upPressed;
     private boolean downPressed;
     private boolean spacePressed;
+    private boolean enterPressed;
 
     @Override
     public void keyTyped(KeyEvent e) {
@@ -28,6 +29,9 @@ public class KeyHandler implements KeyListener {
                 spacePressed = true;
             }
         }
+        if(code == KeyEvent.VK_ENTER) {
+            enterPressed = true;
+        }
     }
 
     @Override
@@ -43,6 +47,9 @@ public class KeyHandler implements KeyListener {
         if(code == KeyEvent.VK_SPACE) {
             spacePressed = false;
         }
+        if(code == KeyEvent.VK_ENTER) {
+            enterPressed = false;
+        }
     }
 
     public boolean isUpPressed() {
@@ -55,5 +62,9 @@ public class KeyHandler implements KeyListener {
 
     public boolean isSpacePressed() {
         return spacePressed;
+    }
+
+    public boolean isEnterPressed() {
+        return enterPressed;
     }
 }

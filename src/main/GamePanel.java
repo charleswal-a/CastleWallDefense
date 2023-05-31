@@ -6,7 +6,11 @@ import entity.Enemy;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Graphics;
+import java.awt.Color;
+import java.awt.Font;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.awt.image.BufferedImage;
@@ -150,18 +154,21 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-
         Graphics2D graphics2D = (Graphics2D) g;
 
         if(backgroundState.equals("title screen")) {
-
+            this.setBackground(Color.black);
+            this.setForeground(Color.white);
+            Font newFont = new Font("TimesRoman", Font.BOLD, 30);
+            graphics2D.setFont(newFont);
+            graphics2D.drawString("Welcome to Castle Wall Defense!", 400, 100);
+            graphics2D.drawString("Press ENTER/RETURN to start", 400, 160);
         }
         if(backgroundState.equals("ended")) {
 
         }
         if(backgroundState.equals("playing")) {
             graphics2D.drawImage(background, 0, 0, tileSize * maxScreenCol, tileSize * maxScreenRow, null);
-            ;
             p.draw(graphics2D, tileSize);
             for (Arrow a : arrows) {
                 a.draw(graphics2D, tileSize);
@@ -186,8 +193,14 @@ public class GamePanel extends JPanel implements Runnable {
         double nextDrawTime = System.nanoTime() + drawInterval;
 
         while (gameThread != null) {
-            update();
+            if (backgroundState.equals("playing")) {
+                update();
+            }
             repaint();
+
+            if (keyH.isEnterPressed() && backgroundState.equals("title screen")) {
+                backgroundState = "playing";
+            }
 
             try {
                 double remainingTime = nextDrawTime - System.nanoTime();
