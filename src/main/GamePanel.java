@@ -11,7 +11,7 @@ import java.awt.Graphics2D;
 import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.Font;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.awt.image.BufferedImage;
 
@@ -25,6 +25,7 @@ public class GamePanel extends JPanel implements Runnable {
     private final int screenHeight = tileSize * maxScreenRow;
     private KeyHandler keyH = new KeyHandler();
     private BufferedImage background;
+    private BufferedImage newBarricade, damagedBarricade, brokenBarricade;
     private String backgroundState;
 
     private Thread gameThread;
@@ -59,12 +60,15 @@ public class GamePanel extends JPanel implements Runnable {
         barricadeHealth = 100;
         killCount = 0;
         killsUntilSpeedBuff = 10;
-        p = new Player(110, tileSize * 2, tileSize, this, keyH);
+        p = new Player(105, tileSize * 2, tileSize, this, keyH);
 
         backgroundState = "title screen";
 
         try {
             background = ImageIO.read(getClass().getResourceAsStream("/Background/Background.png"));
+            newBarricade = ImageIO.read(getClass().getResourceAsStream("/Barricade/Barricade-new.png"));
+            damagedBarricade = ImageIO.read(getClass().getResourceAsStream("/Barricade/Barricade-damaged.png"));
+            brokenBarricade = ImageIO.read(getClass().getResourceAsStream("/Barricade/Barricade-broken.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -79,7 +83,7 @@ public class GamePanel extends JPanel implements Runnable {
         p.update();
         frameCount++;
 
-        if(frameCount == enemyCooldown) {
+        if(frameCount >= enemyCooldown) {
             int x = maxScreenCol * tileSize;
             int i = (int) (Math.random() * yValues.length);
             Enemy e = new Enemy (x, yValues[i], enemySpeed);
@@ -150,26 +154,47 @@ public class GamePanel extends JPanel implements Runnable {
                 i--;
             }
         }
+
+        if(barricadeHealth == 0) {
+            backgroundState = "ended";
+        }
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D graphics2D = (Graphics2D) g;
 
+        Font newFont = new Font("DialogInput", Font.BOLD, 30);
+        graphics2D.setFont(newFont);
+
         if(backgroundState.equals("title screen")) {
             this.setBackground(Color.black);
             this.setForeground(Color.white);
-            Font newFont = new Font("TimesRoman", Font.BOLD, 30);
-            graphics2D.setFont(newFont);
             graphics2D.drawString("Welcome to Castle Wall Defense!", 400, 100);
             graphics2D.drawString("Press ENTER/RETURN to start", 400, 160);
         }
         if(backgroundState.equals("ended")) {
-
+            graphics2D.drawString("GAME OVER", 400, 100);
+            graphics2D.drawString("Your score: " + killCount, 400, 160);
+            graphics2D.drawString("Highscore: " + getHighScore(), 400, 220);
         }
         if(backgroundState.equals("playing")) {
             graphics2D.drawImage(background, 0, 0, tileSize * maxScreenCol, tileSize * maxScreenRow, null);
+
+            BufferedImage barricade = null;
+            if(barricadeHealth <= 10) {
+                barricade = brokenBarricade;
+            }
+            else if(barricadeHealth <= 50) {
+                barricade = damagedBarricade;
+            }
+            else if(barricadeHealth <= 100) {
+                barricade = newBarricade;
+            }
+            graphics2D.drawImage(barricade, tileSize+32, 0, tileSize/2, screenHeight, null);
+
             p.draw(graphics2D, tileSize);
+
             for (Arrow a : arrows) {
                 a.draw(graphics2D, tileSize);
             }
@@ -178,10 +203,8 @@ public class GamePanel extends JPanel implements Runnable {
             }
 
             graphics2D.setColor(Color.black);
-            Font newFont = new Font("TimesRoman", Font.BOLD, 30);
-            graphics2D.setFont(newFont);
-            graphics2D.drawString("Kill Count: " + killCount, 30, 30);
-            graphics2D.drawString("Barricade Health: " + barricadeHealth + "/100", 925, 30);
+            graphics2D.drawString("Kill Count: " + killCount, 825, 70);
+            graphics2D.drawString("Barricade Health: " + barricadeHealth + "/100", 825, 30);
         }
         graphics2D.dispose();
     }
@@ -217,5 +240,34 @@ public class GamePanel extends JPanel implements Runnable {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void saveScore(int score) {
+        try {
+            FileOutputStream writeData = new FileOutputStream("src/main/highScore.data");
+            ObjectOutputStream writeStream = new ObjectOutputStream(writeData);
+
+            writeStream.write(killCount);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int getHighScore() {
+        try {
+            FileInputStream readData;
+            ObjectInputStream readSteam;
+
+            if(new File("src/main/highScore.data").length() != 0) {
+                readData = new FileInputStream("src/main/highScore.data");
+                readSteam = new ObjectInputStream(readData);
+                return readSteam.read();
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }

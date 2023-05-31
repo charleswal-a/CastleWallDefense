@@ -12,9 +12,7 @@ public class Player extends Entity {
     private GamePanel gp;
     private KeyHandler keyH;
     private int framesFromLastMove;
-    private boolean movingUp;
-    private boolean movingDown;
-    private int moveCooldown;
+    private final int moveCooldown = 20;
 
     public Player(int x, int y, int s, GamePanel gp, KeyHandler keyH) {
         super(x, y, s);
@@ -24,9 +22,6 @@ public class Player extends Entity {
         setPlayerImages();
         direction = "still";
         framesFromLastMove = 0;
-        movingUp = false;
-        movingDown = false;
-        moveCooldown = 20;
     }
 
     public void setPlayerImages() {
@@ -57,28 +52,6 @@ public class Player extends Entity {
     }
 
     public void draw(Graphics2D graphics2D, int tileSize){
-        BufferedImage image = null;
-        switch(direction) {
-            case "up":
-                image = bowDrawn;
-                break;
-            case "still":
-                image = bowDrawn;
-                break;
-            case "down":
-                image = bowDrawn;
-                break;
-        }
-
-        graphics2D.drawImage(image, x, y, tileSize, tileSize, null);
+        graphics2D.drawImage(bowDrawn, x, y, tileSize, tileSize, null);
     }
-
-    public int getMoveCooldown() {
-        return moveCooldown;
-    }
-
-    public void setMoveCooldown(int m) {
-        moveCooldown = m;
-    }
-
 }
