@@ -232,7 +232,7 @@ public class GamePanel extends JPanel implements Runnable {
                 if (remainingTime < 0) {
                     remainingTime = 0;
                 }
-
+//
                 Thread.sleep((long) remainingTime);
 
                 nextDrawTime += drawInterval;
