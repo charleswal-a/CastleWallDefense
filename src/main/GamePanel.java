@@ -14,6 +14,7 @@ import java.awt.Font;
 import java.io.*;
 import java.util.ArrayList;
 import java.awt.image.BufferedImage;
+import java.util.Scanner;
 
 public class GamePanel extends JPanel implements Runnable {
     private final int originalTileSize = 16;
@@ -47,6 +48,7 @@ public class GamePanel extends JPanel implements Runnable {
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.setFocusable(true);
+        this.setBackground(Color.BLACK);
         setValues();
     }
 
@@ -89,6 +91,8 @@ public class GamePanel extends JPanel implements Runnable {
             Enemy e = new Enemy (x, yValues[i], enemySpeed);
             enemies.add(e);
             frameCount = 0;
+
+            System.out.println(enemies);
         }
 
         if(keyH.isSpacePressed()) {
@@ -102,7 +106,6 @@ public class GamePanel extends JPanel implements Runnable {
             if(!tooClose) {
                 Arrow a = new Arrow(p.x, p.y, 20);
                 arrows.add(a);
-                System.out.println(arrows);
             }
         }
 
@@ -122,7 +125,9 @@ public class GamePanel extends JPanel implements Runnable {
                         killCount++;
                         killsUntilSpeedBuff--;
                         enemies.remove(k);
-                        arrows.remove(i);
+                        if(arrows.size() > 0) {
+                            arrows.remove(i);
+                        }
                         k = enemies.size();
                     }
                 }
@@ -174,6 +179,10 @@ public class GamePanel extends JPanel implements Runnable {
             graphics2D.drawString("Press ENTER/RETURN to start", 400, 160);
         }
         if(backgroundState.equals("ended")) {
+            if(killCount > getHighScore()) {
+                saveScore(killCount);
+            }
+
             graphics2D.drawString("GAME OVER", 400, 100);
             graphics2D.drawString("Your score: " + killCount, 400, 160);
             graphics2D.drawString("Highscore: " + getHighScore(), 400, 220);
@@ -232,7 +241,7 @@ public class GamePanel extends JPanel implements Runnable {
                 if (remainingTime < 0) {
                     remainingTime = 0;
                 }
-//
+
                 Thread.sleep((long) remainingTime);
 
                 nextDrawTime += drawInterval;
@@ -244,10 +253,8 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void saveScore(int score) {
         try {
-            FileOutputStream writeData = new FileOutputStream("src/main/highScore.data");
-            ObjectOutputStream writeStream = new ObjectOutputStream(writeData);
-
-            writeStream.write(killCount);
+            Writer w = new FileWriter("src/highScoreSave");
+            w.write(Integer.toString(score));
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -256,13 +263,14 @@ public class GamePanel extends JPanel implements Runnable {
 
     public int getHighScore() {
         try {
-            FileInputStream readData;
-            ObjectInputStream readSteam;
-
-            if(new File("src/main/highScore.data").length() != 0) {
-                readData = new FileInputStream("src/main/highScore.data");
-                readSteam = new ObjectInputStream(readData);
-                return readSteam.read();
+            Scanner s = new Scanner(new File("src/highScoreSave"));
+            String score = "";
+            while (s.hasNextLine()) {
+                score += s.nextLine();
+            }
+            if (!score.equals("")) {
+                System.out.println("   ");
+                return Integer.parseInt(score);
             }
         }
         catch (IOException e) {
