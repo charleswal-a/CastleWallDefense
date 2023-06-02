@@ -13,6 +13,7 @@ public class Player extends Entity {
     private KeyHandler keyH;
     private int framesFromLastMove;
     private final int moveCooldown = 20;
+    private BufferedImage bowDrawn;
 
     public Player(int x, int y, int s, GamePanel gp, KeyHandler keyH) {
         super(x, y, s);

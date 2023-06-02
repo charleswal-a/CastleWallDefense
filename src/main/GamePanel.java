@@ -12,6 +12,7 @@ import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.Font;
 import java.io.*;
+import java.security.spec.ECParameterSpec;
 import java.util.ArrayList;
 import java.awt.image.BufferedImage;
 import java.util.Scanner;
@@ -253,8 +254,9 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void saveScore(int score) {
         try {
-            Writer w = new FileWriter("src/highScoreSave");
-            w.write(Integer.toString(score));
+            FileOutputStream writeData = new FileOutputStream("src/highScoreSave");
+            ObjectOutputStream writeStream = new ObjectOutputStream(writeData);
+            writeStream.writeObject(score);
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -263,17 +265,16 @@ public class GamePanel extends JPanel implements Runnable {
 
     public int getHighScore() {
         try {
-            Scanner s = new Scanner(new File("src/highScoreSave"));
-            String score = "";
-            while (s.hasNextLine()) {
-                score += s.nextLine();
-            }
-            if (!score.equals("")) {
-                System.out.println("   ");
-                return Integer.parseInt(score);
+            FileInputStream readData;
+            ObjectInputStream readStream;
+
+            if(new File("src/highScoreSave").length() != 0) {
+                readData = new FileInputStream("src/highScoreSave");
+                readStream = new ObjectInputStream(readData);
+                return (int) readStream.readObject();
             }
         }
-        catch (IOException e) {
+        catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         return 0;
