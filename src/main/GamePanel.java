@@ -11,11 +11,14 @@ import java.awt.Graphics2D;
 import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.Font;
-import java.io.*;
-import java.security.spec.ECParameterSpec;
+import java.io.IOException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.awt.image.BufferedImage;
-import java.util.Scanner;
 
 public class GamePanel extends JPanel implements Runnable {
     private final int originalTileSize = 16;
@@ -25,10 +28,12 @@ public class GamePanel extends JPanel implements Runnable {
     private final int maxScreenRow = 5;
     private final int screenWidth = tileSize * maxScreenCol;
     private final int screenHeight = tileSize * maxScreenRow;
-    private KeyHandler keyH = new KeyHandler();
-    private BufferedImage background;
+    private final KeyHandler keyH = new KeyHandler();
+    private BufferedImage gameBackground, titleSrn1, titleSrn2, howToPlay;
     private BufferedImage newBarricade, damagedBarricade, brokenBarricade;
     private String backgroundState;
+    private String titleScreenState;
+    private int framesSinceLastEnter;
 
     private Thread gameThread;
     private int enemyCooldown;
@@ -66,12 +71,17 @@ public class GamePanel extends JPanel implements Runnable {
         p = new Player(105, tileSize * 2, tileSize, this, keyH);
 
         backgroundState = "title screen";
+        titleScreenState = "option 1";
+        framesSinceLastEnter = 0;
 
         try {
-            background = ImageIO.read(getClass().getResourceAsStream("/Background/Background.png"));
+            gameBackground = ImageIO.read(getClass().getResourceAsStream("/Background/Background.png"));
             newBarricade = ImageIO.read(getClass().getResourceAsStream("/Barricade/Barricade-new.png"));
             damagedBarricade = ImageIO.read(getClass().getResourceAsStream("/Barricade/Barricade-damaged.png"));
             brokenBarricade = ImageIO.read(getClass().getResourceAsStream("/Barricade/Barricade-broken.png"));
+            titleSrn1 = ImageIO.read(getClass().getResourceAsStream("/Background/Title-screen-1.png"));
+            titleSrn2 = ImageIO.read(getClass().getResourceAsStream("/Background/Title-screen-2.png"));
+            howToPlay = ImageIO.read(getClass().getResourceAsStream("/Background/How-to-play.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -83,86 +93,113 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void update() {
-        p.update();
-        frameCount++;
+        if (backgroundState.equals("playing")) {
+            p.update();
+            frameCount++;
 
-        if(frameCount >= enemyCooldown) {
-            int x = maxScreenCol * tileSize;
-            int i = (int) (Math.random() * yValues.length);
-            Enemy e = new Enemy (x, yValues[i], enemySpeed);
-            enemies.add(e);
-            frameCount = 0;
+            if (frameCount >= enemyCooldown) {
+                int x = maxScreenCol * tileSize;
+                int i = (int) (Math.random() * yValues.length);
+                Enemy e = new Enemy(x, yValues[i], enemySpeed);
+                enemies.add(e);
+                frameCount = 0;
 
-            System.out.println(enemies);
-        }
-
-        if(keyH.isSpacePressed()) {
-            boolean tooClose = false;
-
-            for(Arrow a : arrows) {
-                if(a.x < p.x + 300) {
-                    tooClose = true;
-                }
-            }
-            if(!tooClose) {
-                Arrow a = new Arrow(p.x, p.y, 20);
-                arrows.add(a);
-            }
-        }
-
-        for(int i = 0; i < arrows.size(); i++) {
-            Arrow a = arrows.get(i);
-            if(a.x > tileSize * maxScreenCol) {
-                arrows.remove(i);
-            }
-            else {
-                a.moveForward();
+                System.out.println(enemies);
             }
 
-            for(int k = 0; k < enemies.size(); k++) {
-                Enemy e = enemies.get(k);
-                if(a.y == e.y) {
-                    if(a.x >= e.x) {
-                        killCount++;
-                        killsUntilSpeedBuff--;
-                        enemies.remove(k);
-                        if(arrows.size() > 0) {
-                            arrows.remove(i);
-                        }
-                        k = enemies.size();
+            if (keyH.isSpacePressed()) {
+                boolean tooClose = false;
+
+                for (Arrow a : arrows) {
+                    if (a.x < p.x + 300) {
+                        tooClose = true;
                     }
                 }
+                if (!tooClose) {
+                    Arrow a = new Arrow(p.x, p.y, 20);
+                    arrows.add(a);
+                }
             }
 
-            if(killsUntilSpeedBuff == 0) {
-                enemySpeed += 2;
-                if (enemyCooldown != 60) {
-                    enemyCooldown -= 20;
+            for (int i = 0; i < arrows.size(); i++) {
+                Arrow a = arrows.get(i);
+                if (a.x > tileSize * maxScreenCol) {
+                    arrows.remove(i);
+                } else {
+                    a.moveForward();
                 }
-                for(Enemy e : enemies) {
-                    e.setSpeed(enemySpeed);
+
+                for (int k = 0; k < enemies.size(); k++) {
+                    Enemy e = enemies.get(k);
+                    if (a.y == e.y) {
+                        if (a.x >= e.x) {
+                            killCount++;
+                            killsUntilSpeedBuff--;
+                            enemies.remove(k);
+                            if (arrows.size() > 0) {
+                                arrows.remove(i);
+                            }
+                            k = enemies.size();
+                        }
+                    }
                 }
-                killsUntilSpeedBuff = 10;
+
+                if (killsUntilSpeedBuff == 0) {
+                    enemySpeed += 2;
+                    if (enemyCooldown != 60) {
+                        enemyCooldown -= 20;
+                    }
+                    for (Enemy e : enemies) {
+                        e.setSpeed(enemySpeed);
+                    }
+                    killsUntilSpeedBuff = 10;
+                }
+
             }
 
+            for (int i = 0; i < enemies.size(); i++) {
+                Enemy e = enemies.get(i);
+                if (e.x + e.speed > 200) {
+                    e.moveForward();
+                } else if (e.getState().equals("attacking") && e.getFrameCount() <= 25) {
+                    if (barricadeHealth != 0) {
+                        barricadeHealth -= 10;
+                    }
+                    enemies.remove(i);
+                    i--;
+                }
+            }
+
+            if (barricadeHealth == 0) {
+                backgroundState = "ended";
+            }
         }
-
-        for (int i = 0; i < enemies.size(); i++){
-            Enemy e = enemies.get(i);
-            if (e.x + e.speed > 200) {
-                e.moveForward();
+        else if (backgroundState.equals("title screen")) {
+            switch (titleScreenState) {
+                case "option 1":
+                    if (keyH.isDownPressed()) {
+                        titleScreenState = "option 2";
+                    } else if (keyH.isEnterPressed() && framesSinceLastEnter >= 30) {
+                        backgroundState = "playing";
+                        framesSinceLastEnter = 0;
+                    }
+                    break;
+                case "option 2":
+                    if (keyH.isUpPressed()) {
+                        titleScreenState = "option 1";
+                    } else if (keyH.isEnterPressed() && framesSinceLastEnter >= 30) {
+                            titleScreenState = "how to play";
+                            framesSinceLastEnter = 0;
+                    }
+                    break;
+                case "how to play":
+                    if (keyH.isEnterPressed() && framesSinceLastEnter >= 30) {
+                        titleScreenState = "option 2";
+                        framesSinceLastEnter = 0;
+                    }
+                    break;
             }
-            else if (e.getState().equals("attacking") && e.getFrameCount() <= 25) {
-                if(barricadeHealth != 0) {
-                    barricadeHealth -= 10;
-                }
-                enemies.remove(i);
-                i--;
-            }
-        }
-
-        if(barricadeHealth == 0) {
-            backgroundState = "ended";
+            framesSinceLastEnter++;
         }
     }
 
@@ -174,22 +211,31 @@ public class GamePanel extends JPanel implements Runnable {
         graphics2D.setFont(newFont);
 
         if(backgroundState.equals("title screen")) {
-            this.setBackground(Color.black);
-            this.setForeground(Color.white);
-            graphics2D.drawString("Welcome to Castle Wall Defense!", 400, 100);
-            graphics2D.drawString("Press ENTER/RETURN to start", 400, 160);
+            BufferedImage image = null;
+            if(titleScreenState.equals("option 1")) {
+                image = titleSrn1;
+            }
+            else if(titleScreenState.equals("option 2")) {
+                image = titleSrn2;
+            }
+            else if(titleScreenState.equals("how to play")){
+                image = howToPlay;
+            }
+
+            graphics2D.drawImage(image, 0, 0, screenWidth, screenHeight, null);
         }
         if(backgroundState.equals("ended")) {
             if(killCount > getHighScore()) {
                 saveScore(killCount);
             }
 
+            graphics2D.setColor(Color.WHITE);
             graphics2D.drawString("GAME OVER", 400, 100);
             graphics2D.drawString("Your score: " + killCount, 400, 160);
-            graphics2D.drawString("Highscore: " + getHighScore(), 400, 220);
+            graphics2D.drawString("High score: " + getHighScore(), 400, 220);
         }
         if(backgroundState.equals("playing")) {
-            graphics2D.drawImage(background, 0, 0, tileSize * maxScreenCol, tileSize * maxScreenRow, null);
+            graphics2D.drawImage(gameBackground, 0, 0, tileSize * maxScreenCol, tileSize * maxScreenRow, null);
 
             BufferedImage barricade = null;
             if(barricadeHealth <= 10) {
@@ -226,14 +272,8 @@ public class GamePanel extends JPanel implements Runnable {
         double nextDrawTime = System.nanoTime() + drawInterval;
 
         while (gameThread != null) {
-            if (backgroundState.equals("playing")) {
-                update();
-            }
+            update();
             repaint();
-
-            if (keyH.isEnterPressed() && backgroundState.equals("title screen")) {
-                backgroundState = "playing";
-            }
 
             try {
                 double remainingTime = nextDrawTime - System.nanoTime();
