@@ -21,7 +21,6 @@ public class Player extends Entity {
         this.keyH = keyH;
 
         setPlayerImages();
-        direction = "still";
         framesFromLastMove = 0;
     }
 
@@ -36,15 +35,13 @@ public class Player extends Entity {
     public void update() {
         if(framesFromLastMove >= moveCooldown) {
             if (keyH.isUpPressed()) {
-                direction = "up";
-                if (y > 0) {
-                    y -= speed;
+                if (getY() > 72) {
+                    setY(getY() - getSpeed());
                 }
                 framesFromLastMove = 0;
             } else if (keyH.isDownPressed()) {
-                direction = "down";
-                if (y < 576) {
-                    y += speed;
+                if (getY() < 648) {
+                    setY(getY() + getSpeed());
                 }
                 framesFromLastMove = 0;
             }
@@ -53,6 +50,6 @@ public class Player extends Entity {
     }
 
     public void draw(Graphics2D graphics2D, int tileSize){
-        graphics2D.drawImage(bowDrawn, x, y, tileSize, tileSize, null);
+        graphics2D.drawImage(bowDrawn, getX(), getY(), tileSize, tileSize, null);
     }
 }

@@ -13,7 +13,7 @@ public class Arrow extends Entity {
     }
 
     public void moveForward() {
-        x += speed;
+        setX(getX() + getSpeed());
     }
 
     public void setArrowImage() {
@@ -25,6 +25,6 @@ public class Arrow extends Entity {
     }
 
     public void draw(Graphics2D graphics2D, int tileSize) {
-        graphics2D.drawImage(arrowImage, x, y, tileSize, tileSize, null);
+        graphics2D.drawImage(arrowImage, getX(), getY(), tileSize, tileSize, null);
     }
 }

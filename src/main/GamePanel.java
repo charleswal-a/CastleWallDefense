@@ -6,11 +6,7 @@ import entity.Enemy;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Graphics;
-import java.awt.Color;
-import java.awt.Font;
+import java.awt.*;
 import java.io.IOException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,9 +23,10 @@ public class GamePanel extends JPanel implements Runnable {
     private final int maxScreenCol = 9;
     private final int maxScreenRow = 5;
     private final int screenWidth = tileSize * maxScreenCol;
-    private final int screenHeight = tileSize * maxScreenRow;
+    private final int screenHeight = tileSize * maxScreenRow + 72;
     private final KeyHandler keyH = new KeyHandler();
-    private BufferedImage gameBackground, titleSrn1, titleSrn2, howToPlay;
+    private BufferedImage gameBackground, titleSrn1, titleSrn2, howToPlay, endingSrn1, endingSrn2, topBar;
+    private BufferedImage number1, number2, number3, number4, number5, number6, number7, number8, number9, number0;
     private BufferedImage newBarricade, damagedBarricade, brokenBarricade;
     private String backgroundState;
     private String titleScreenState;
@@ -45,8 +42,9 @@ public class GamePanel extends JPanel implements Runnable {
     private int fps;
     private int barricadeHealth;
     private int killCount;
+    private int highScore;
     private int killsUntilSpeedBuff;
-    private final int[] yValues = {0, 144, 288, 432, 576};
+    private final int[] yValues = {72, 216, 360, 504, 648};
 
 
     public GamePanel() {
@@ -54,25 +52,17 @@ public class GamePanel extends JPanel implements Runnable {
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.setFocusable(true);
-        this.setBackground(Color.BLACK);
+        this.setBackground(new Color(0, 199, 255));
         setValues();
     }
 
     private void setValues() {
-        arrows = new ArrayList<Arrow>();
-        enemies = new ArrayList<Enemy>();
+        resetGame();
         fps = 60;
-        enemyCooldown = 120;
-        frameCount = 0;
-        enemySpeed = 5;
-        barricadeHealth = 100;
-        killCount = 0;
-        killsUntilSpeedBuff = 10;
-        p = new Player(105, tileSize * 2, tileSize, this, keyH);
-
-        backgroundState = "title screen";
-        titleScreenState = "option 1";
         framesSinceLastEnter = 0;
+        titleScreenState = "option 1";
+        backgroundState = "title screen";
+        highScore = getHighScore();
 
         try {
             gameBackground = ImageIO.read(getClass().getResourceAsStream("/Background/Background.png"));
@@ -82,9 +72,35 @@ public class GamePanel extends JPanel implements Runnable {
             titleSrn1 = ImageIO.read(getClass().getResourceAsStream("/Background/Title-screen-1.png"));
             titleSrn2 = ImageIO.read(getClass().getResourceAsStream("/Background/Title-screen-2.png"));
             howToPlay = ImageIO.read(getClass().getResourceAsStream("/Background/How-to-play.png"));
+            endingSrn1 = ImageIO.read(getClass().getResourceAsStream("/Background/Ending-no-new-score.png"));
+            endingSrn2 = ImageIO.read(getClass().getResourceAsStream("/Background/Ending-new-score.png"));
+            topBar = ImageIO.read(getClass().getResourceAsStream("/Background/Top-bar.png"));
+
+            number1 = ImageIO.read(getClass().getResourceAsStream("/Numbers/1.png"));
+            number2 = ImageIO.read(getClass().getResourceAsStream("/Numbers/2.png"));
+            number3 = ImageIO.read(getClass().getResourceAsStream("/Numbers/3.png"));
+            number4 = ImageIO.read(getClass().getResourceAsStream("/Numbers/4.png"));
+            number5 = ImageIO.read(getClass().getResourceAsStream("/Numbers/5.png"));
+            number6 = ImageIO.read(getClass().getResourceAsStream("/Numbers/6.png"));
+            number7 = ImageIO.read(getClass().getResourceAsStream("/Numbers/7.png"));
+            number8 = ImageIO.read(getClass().getResourceAsStream("/Numbers/8.png"));
+            number9 = ImageIO.read(getClass().getResourceAsStream("/Numbers/9.png"));
+            number0 = ImageIO.read(getClass().getResourceAsStream("/Numbers/0.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void resetGame() {
+        arrows = new ArrayList<Arrow>();
+        enemies = new ArrayList<Enemy>();
+        enemyCooldown = 120;
+        frameCount = 0;
+        enemySpeed = 5;
+        barricadeHealth = 100;
+        killCount = 0;
+        killsUntilSpeedBuff = 10;
+        p = new Player(99, tileSize * 2 + 72, tileSize, this, keyH);
     }
 
     public void startGameThread() {
@@ -103,27 +119,31 @@ public class GamePanel extends JPanel implements Runnable {
                 Enemy e = new Enemy(x, yValues[i], enemySpeed);
                 enemies.add(e);
                 frameCount = 0;
-
-                System.out.println(enemies);
             }
 
             if (keyH.isSpacePressed()) {
                 boolean tooClose = false;
 
                 for (Arrow a : arrows) {
-                    if (a.x < p.x + 300) {
+                    if (a.getX() < p.getX() + 300) {
                         tooClose = true;
                     }
                 }
                 if (!tooClose) {
-                    Arrow a = new Arrow(p.x, p.y, 20);
+                    Arrow a = new Arrow(p.getX(), p.getY(), 20);
                     arrows.add(a);
                 }
             }
 
+            //test code
+            if(keyH.isEnterPressed() && framesSinceLastEnter >= 60) {
+                framesSinceLastEnter = 0;
+                barricadeHealth = 0;
+            }
+
             for (int i = 0; i < arrows.size(); i++) {
                 Arrow a = arrows.get(i);
-                if (a.x > tileSize * maxScreenCol) {
+                if (a.getX() > tileSize * maxScreenCol) {
                     arrows.remove(i);
                 } else {
                     a.moveForward();
@@ -131,8 +151,8 @@ public class GamePanel extends JPanel implements Runnable {
 
                 for (int k = 0; k < enemies.size(); k++) {
                     Enemy e = enemies.get(k);
-                    if (a.y == e.y) {
-                        if (a.x >= e.x) {
+                    if (a.getY() == e.getY()) {
+                        if (a.getX() >= e.getX()) {
                             killCount++;
                             killsUntilSpeedBuff--;
                             enemies.remove(k);
@@ -159,7 +179,7 @@ public class GamePanel extends JPanel implements Runnable {
 
             for (int i = 0; i < enemies.size(); i++) {
                 Enemy e = enemies.get(i);
-                if (e.x + e.speed > 200) {
+                if (e.getX() + e.getSpeed() > 200) {
                     e.moveForward();
                 } else if (e.getState().equals("attacking") && e.getFrameCount() <= 25) {
                     if (barricadeHealth != 0) {
@@ -172,9 +192,12 @@ public class GamePanel extends JPanel implements Runnable {
 
             if (barricadeHealth == 0) {
                 backgroundState = "ended";
+                framesSinceLastEnter = 0;
             }
         }
         else if (backgroundState.equals("title screen")) {
+            resetGame();
+
             switch (titleScreenState) {
                 case "option 1":
                     if (keyH.isDownPressed()) {
@@ -201,41 +224,56 @@ public class GamePanel extends JPanel implements Runnable {
             }
             framesSinceLastEnter++;
         }
+        else if(backgroundState.equals("ended")) {
+            if(keyH.isEnterPressed() && framesSinceLastEnter >= 60) {
+                backgroundState = "title screen";
+                framesSinceLastEnter = 0;
+            }
+            framesSinceLastEnter++;
+        }
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D graphics2D = (Graphics2D) g;
 
-        Font newFont = new Font("DialogInput", Font.BOLD, 30);
-        graphics2D.setFont(newFont);
-
         if(backgroundState.equals("title screen")) {
             BufferedImage image = null;
-            if(titleScreenState.equals("option 1")) {
-                image = titleSrn1;
-            }
-            else if(titleScreenState.equals("option 2")) {
-                image = titleSrn2;
-            }
-            else if(titleScreenState.equals("how to play")){
-                image = howToPlay;
+            switch (titleScreenState) {
+                case "option 1":
+                    image = titleSrn1;
+                    break;
+                case "option 2":
+                    image = titleSrn2;
+                    break;
+                case "how to play":
+                    image = howToPlay;
+                    break;
             }
 
-            graphics2D.drawImage(image, 0, 0, screenWidth, screenHeight, null);
+            graphics2D.drawImage(image, 0, 72, screenWidth, screenHeight-72, null);
         }
         if(backgroundState.equals("ended")) {
-            if(killCount > getHighScore()) {
-                saveScore(killCount);
+            if(killCount < highScore) {
+                graphics2D.drawImage(endingSrn1, 0, 72, screenWidth, screenHeight-72, null);
+            }
+            else {
+                if(highScore != killCount) {
+                    saveScore(killCount);
+                }
+                highScore = killCount;
+                graphics2D.drawImage(endingSrn2, 0, 72, screenWidth, screenHeight-72, null);
             }
 
-            graphics2D.setColor(Color.WHITE);
-            graphics2D.drawString("GAME OVER", 400, 100);
-            graphics2D.drawString("Your score: " + killCount, 400, 160);
-            graphics2D.drawString("High score: " + getHighScore(), 400, 220);
+            drawNumbers(graphics2D, 846, 477, killCount);
+            drawNumbers(graphics2D,  837, 576, highScore);
         }
         if(backgroundState.equals("playing")) {
-            graphics2D.drawImage(gameBackground, 0, 0, tileSize * maxScreenCol, tileSize * maxScreenRow, null);
+            graphics2D.drawImage(gameBackground, 0, 72, tileSize * maxScreenCol, tileSize * maxScreenRow, null);
+            graphics2D.drawImage(topBar, 0,0, screenWidth, 72, null);
+
+            drawNumbers(graphics2D, 558, 9, barricadeHealth);
+            drawNumbers(graphics2D, 1206, 9, killCount);
 
             BufferedImage barricade = null;
             if(barricadeHealth <= 10) {
@@ -247,7 +285,7 @@ public class GamePanel extends JPanel implements Runnable {
             else if(barricadeHealth <= 100) {
                 barricade = newBarricade;
             }
-            graphics2D.drawImage(barricade, tileSize+32, 0, tileSize/2, screenHeight, null);
+            graphics2D.drawImage(barricade, tileSize+32, 72, tileSize/2, screenHeight-72, null);
 
             p.draw(graphics2D, tileSize);
 
@@ -257,10 +295,6 @@ public class GamePanel extends JPanel implements Runnable {
             for (Enemy e : enemies) {
                 e.draw(graphics2D, tileSize);
             }
-
-            graphics2D.setColor(Color.black);
-            graphics2D.drawString("Kill Count: " + killCount, 825, 70);
-            graphics2D.drawString("Barricade Health: " + barricadeHealth + "/100", 825, 30);
         }
         graphics2D.dispose();
     }
@@ -294,7 +328,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void saveScore(int score) {
         try {
-            FileOutputStream writeData = new FileOutputStream("src/highScoreSave");
+            FileOutputStream writeData = new FileOutputStream("src/highScore.data");
             ObjectOutputStream writeStream = new ObjectOutputStream(writeData);
             writeStream.writeObject(score);
         }
@@ -308,8 +342,8 @@ public class GamePanel extends JPanel implements Runnable {
             FileInputStream readData;
             ObjectInputStream readStream;
 
-            if(new File("src/highScoreSave").length() != 0) {
-                readData = new FileInputStream("src/highScoreSave");
+            if(new File("src/highScore.data").length() != 0) {
+                readData = new FileInputStream("src/highScore.data");
                 readStream = new ObjectInputStream(readData);
                 return (int) readStream.readObject();
             }
@@ -318,5 +352,51 @@ public class GamePanel extends JPanel implements Runnable {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public BufferedImage determineNumImage(int digit) {
+        BufferedImage image;
+        if(digit == 1) {
+            image = number1;
+        }
+        else if(digit == 2) {
+            image = number2;
+        }
+        else if(digit == 3) {
+            image = number3;
+        }
+        else if(digit == 4) {
+            image = number4;
+        }
+        else if(digit == 5) {
+            image = number5;
+        }
+        else if(digit == 6) {
+            image = number6;
+        }
+        else if(digit == 7) {
+            image = number7;
+        }
+        else if(digit == 8) {
+            image = number8;
+        }
+        else if(digit == 9) {
+            image = number9;
+        }
+        else {
+            image = number0;
+        }
+
+        return image;
+    }
+
+    public void drawNumbers(Graphics2D graphics2D, int x, int y, int num) {
+        String numAsString = Integer.toString(num);
+
+        for(int i = 0; i < numAsString.length(); i++) {
+            int digit = Integer.parseInt(numAsString.substring(i, i+1));
+            BufferedImage image = determineNumImage(digit);
+            graphics2D.drawImage(image, x + i * 45, y, 36, 45, null);
+        }
     }
 }

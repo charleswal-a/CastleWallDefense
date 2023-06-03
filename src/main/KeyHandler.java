@@ -18,10 +18,10 @@ public class KeyHandler implements KeyListener {
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
 
-        if(code == KeyEvent.VK_W) {
+        if(code == KeyEvent.VK_W || code == KeyEvent.VK_UP) {
             upPressed = true;
         }
-        if(code == KeyEvent.VK_S) {
+        if(code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) {
             downPressed = true;
         }
         if(code == KeyEvent.VK_SPACE) {
@@ -38,10 +38,10 @@ public class KeyHandler implements KeyListener {
     public void keyReleased(KeyEvent e) {
         int code = e.getKeyCode();
 
-        if(code == KeyEvent.VK_W) {
+        if(code == KeyEvent.VK_W || code == KeyEvent.VK_UP) {
             upPressed = false;
         }
-        if(code == KeyEvent.VK_S) {
+        if(code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) {
             downPressed = false;
         }
         if(code == KeyEvent.VK_SPACE) {

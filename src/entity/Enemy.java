@@ -18,8 +18,8 @@ public class Enemy extends Entity {
     }
 
     public void moveForward() {
-        x -= speed;
-        if(x - speed < 200) {
+        setX(getX() - getSpeed());
+        if(getX() - getSpeed() < 200) {
             state = "attacking";
         }
     }
@@ -59,7 +59,7 @@ public class Enemy extends Entity {
                 }
                 break;
         }
-        graphics2D.drawImage(image, x, y, tileSize, tileSize, null);
+        graphics2D.drawImage(image, getX(), getY(), tileSize, tileSize, null);
 
         if (frameCount == 40) {
             frameCount = 1;
@@ -72,9 +72,5 @@ public class Enemy extends Entity {
 
     public int getFrameCount() {
         return frameCount;
-    }
-
-    public void setSpeed(int s) {
-        speed = s;
     }
 }
