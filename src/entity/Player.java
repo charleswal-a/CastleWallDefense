@@ -9,15 +9,13 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class Player extends Entity {
-    private GamePanel gp;
     private KeyHandler keyH;
     private int framesFromLastMove;
     private final int moveCooldown = 20;
     private BufferedImage bowDrawn;
 
-    public Player(int x, int y, int s, GamePanel gp, KeyHandler keyH) {
+    public Player(int x, int y, int s, KeyHandler keyH) {
         super(x, y, s);
-        this.gp = gp;
         this.keyH = keyH;
 
         setPlayerImages();
@@ -26,7 +24,7 @@ public class Player extends Entity {
 
     public void setPlayerImages() {
         try {
-            bowDrawn = ImageIO.read(getClass().getResourceAsStream("/Player/Player-still-1.png"));
+            bowDrawn = ImageIO.read(getClass().getResourceAsStream("/Player/Player-still.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -31,7 +31,6 @@ public class GamePanel extends JPanel implements Runnable {
     private String backgroundState;
     private String titleScreenState;
     private int framesSinceLastEnter;
-
     private Thread gameThread;
     private int enemyCooldown;
     private int frameCount;
@@ -100,7 +99,7 @@ public class GamePanel extends JPanel implements Runnable {
         barricadeHealth = 100;
         killCount = 0;
         killsUntilSpeedBuff = 10;
-        p = new Player(99, tileSize * 2 + 72, tileSize, this, keyH);
+        p = new Player(99, tileSize * 2 + 72, tileSize, keyH);
     }
 
     public void startGameThread() {

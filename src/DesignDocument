@@ -1,2 +1,206 @@
 Castle Wall Defense Design Document
 
+    images
+        Arrow package
+            Contains the images representing an arrow shot by the player
+
+        Background package
+            Contains the images that will make up the background of the game
+
+        Barricade package
+            Contains the images representing the barricade at different states
+
+        Enemy package
+            Contains the images representing an enemy at different states in the animation
+
+        Numbers package
+            Contains the images representing numbers 0-9
+
+        Player package
+            Contains the image representing the player
+
+    src
+        entity package
+            Entity
+                private int x
+                private int y
+                private int speed
+
+                public Entity(int x, int y, int speed)
+                    initializes instance variables x, y, and speed to corresponding parameters
+
+                public int getX()
+                    returns the value stored in instance variable x
+
+                public void setX(int x)
+                    sets instance variable x to parameter x
+
+                public int getY()
+                    returns the value stored in instance variable y
+
+                public void setY(int y)
+                    sets instance variable y to parameter y
+
+                public int getSpeed()
+                    returns the value stored in instance variable speed
+
+                public void setSpeed(int speed)
+                    sets instance variable speed to parameter speed
+
+            Enemy (extends Entity)
+                private BufferedImage running, still, attacking
+                private String state
+                private int frameCount
+
+                public Enemy(int x, int y, int s)
+                    calls constructor of superclass Entity
+                    calls setEnemyImages() and initializes instance variables state and frameCount
+
+                public moveForward()
+                    lowers x value by speed if enemy not already at barricade
+
+                public void setEnemyImages()
+                    initializes BufferedImage instance variables with correct png files
+
+                public void draw()
+                    draws image of enemy depending on section of animation the enemy is in
+
+                public String getState()
+                    returns the value stored in instance variable state
+
+                public int getFrameCount()
+                    returns the value stored in instance variable frameCount
+
+            Player (extends Entity)
+                private KeyHandler keyH
+                private int framesFromLastMove
+                private final int moveCooldown
+                private BufferedImage bowDrawn
+
+                public Player(int x, int y, int s, KeyHandler keyH)
+                    calls constructor of superclass Entity
+                    calls setPlayerImages() and initializes instance variables moveCooldown and keyH
+
+                public void setPlayerImages()
+                    initializes BufferedImage instance variable bowDrawn with correct png file
+
+                public void update()
+                    changes player position depending on isUpPressed() and isDownPressed from keyH
+
+                public void draw()
+                    draws image of player at corresponding location
+
+            Arrow (extends Entity)
+                private BufferedImage arrowImage
+
+                public Arrow(int x, int y, int s)
+                    calls constructor of superclass Entity
+                    calls setArrowImage()
+
+                public void moveForward()
+                    increases x value by speed
+
+                public void setArrowImage()
+                    initializes BufferedImage instance variable arrowImage with correct png file
+
+                public void draw()
+                    draws image of arrow at corresponding location
+
+        main package
+            GamePanel (extends JPanel, implements Runnable)
+                private final int originalTileSize = 16;
+                    private final int scale
+                    private final int tileSize
+                    private final int maxScreenCol
+                    private final int maxScreenRow
+                    private final int screenWidth
+                    private final int screenHeight
+                    private final KeyHandler keyH
+                    private BufferedImage gameBackground, titleSrn1, titleSrn2, howToPlay, endingSrn1, endingSrn2, topBar
+                    private BufferedImage number1, number2, number3, number4, number5, number6, number7, number8, number9, number0
+                    private BufferedImage newBarricade, damagedBarricade, brokenBarricade
+                    private String backgroundState
+                    private String titleScreenState
+                    private int framesSinceLastEnter
+                    private Thread gameThread
+                    private int enemyCooldown
+                    private int frameCount
+                    private int enemySpeed
+                    private Player p
+                    private ArrayList<Arrow> arrows
+                    private ArrayList<Enemy> enemies
+                    private int fps
+                    private int barricadeHealth
+                    private int killCount
+                    private int highScore
+                    private int killsUntilSpeedBuff
+                    private final int[] yValues
+
+                    public GamePanel()
+                        sets properties of the JPanel and calls setValues()
+
+                    public void setValues()
+                        calls resetGame() and sets values of some instance variables
+                        initializes BufferedImage variables with correct png images
+
+                    public void resetGame()
+                        sets values of some instance variables to reset game to starting position
+
+                    public void startGameThread()
+                        starts Thread stored in private instance variable gameThread
+
+                    public void update()
+                        contains the code to update each part of the program depending on the state of the game
+
+                    public void paintComponent(Graphics g)
+                        contains the code to draw each part of the program depending on the state of the game
+
+                    public void run()
+                        calls update() and repaint() for each frame of the game
+
+                    public void saveScore(int score)
+                        writes parameter score to File highScore.data
+
+                    public int getHighScore()
+                        returns value stored in File highScore.data
+
+                    public BufferedImage determineNumImage(int digit)
+                        returns BufferedImage corresponding to correct png image that represents parameter digit
+
+                    public void drawNumbers(Graphics2D graphics2D, int x, int y, int num)
+                        draws images representing parameter num at coordinates corresponding to parameters x and y
+
+            GameWindow
+                main()
+                    creates instance of JFrame and sets its properties
+                    calls constructor of GamePanel and calls startGameThread()
+
+            KeyHandler (implements KeyListener)
+                    private boolean upPressed
+                    private boolean downPressed
+                    private boolean spacePressed
+                    private boolean enterPressed
+
+                    public void keyTyped(KeyEvent e)
+                        overridden only to fulfill KeyListener implementation requirement
+
+                    public void keyPressed(KeyEvent e)
+                        changes boolean instance variables to true depending on key pressed
+
+                    public void keyReleased(KeyEvent e)
+                        changes boolean instance variables to false depending on key pressed
+
+                    public boolean isUpPressed()
+                        returns value stored in instance variable upPressed
+
+                    public boolean isDownPressed()
+                        returns value stored in instance variable downPressed
+
+                    public boolean isSpacePressed()
+                        returns value stored in instance variable spacePressed
+
+                    public boolean isEnterPressed()
+                        returns value stored in instance variable enterPressed
+
+        highScore.data
+            file that high score will be written/read from each time program is run
