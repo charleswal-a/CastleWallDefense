@@ -116,6 +116,7 @@ Castle Wall Defense Design Document
                     private final int screenWidth
                     private final int screenHeight
                     private final KeyHandler keyH
+                    private Sound backgroundMusic, titleScreenMusic
                     private BufferedImage gameBackground, titleSrn1, titleSrn2, howToPlay, endingSrn1, endingSrn2, topBar
                     private BufferedImage number1, number2, number3, number4, number5, number6, number7, number8, number9, number0
                     private BufferedImage newBarricade, damagedBarricade, brokenBarricade
@@ -150,7 +151,7 @@ Castle Wall Defense Design Document
                         starts Thread stored in private instance variable gameThread
 
                     public void update()
-                        contains the code to update each part of the program depending on the state of the game
+                        contains the code to update each part of the program and music depending on the state of the game
 
                     public void paintComponent(Graphics g)
                         contains the code to draw each part of the program depending on the state of the game
@@ -201,6 +202,20 @@ Castle Wall Defense Design Document
 
                     public boolean isEnterPressed()
                         returns value stored in instance variable enterPressed
+
+            Sound
+                private Clip clip
+                private AudioInputStream stream
+                private File song
+
+                public Song(String url)
+                    initializes instance variables depending on the file linked to parameter url
+
+                public void playLooped()
+                    plays a continuous loop of the sound stored in instance variable clip
+
+                public void stopMusic()
+                    pauses the music from instance variable clip that was previous playing
 
         highScore.data
             file that high score will be written/read from each time program is run

@@ -17,14 +17,15 @@ import java.util.ArrayList;
 import java.awt.image.BufferedImage;
 
 public class GamePanel extends JPanel implements Runnable {
-    private final int originalTileSize = 16;
-    private final int scale = 9;
-    private final int tileSize = originalTileSize * scale;
-    private final int maxScreenCol = 9;
-    private final int maxScreenRow = 5;
-    private final int screenWidth = tileSize * maxScreenCol;
-    private final int screenHeight = tileSize * maxScreenRow + 72;
-    private final KeyHandler keyH = new KeyHandler();
+    private final int ORIGINAL_TILE_SIZE = 16;
+    private final int SCALE = 9;
+    private final int TILE_SIZE = ORIGINAL_TILE_SIZE * SCALE;
+    private final int MAX_SCREEN_COL = 9;
+    private final int MAX_SCREEN_ROW = 5;
+    private final int SCREEN_WIDTH = TILE_SIZE * MAX_SCREEN_COL;
+    private final int SCREEN_HEIGHT = TILE_SIZE * MAX_SCREEN_ROW + 72;
+    private final KeyHandler KEY_H = new KeyHandler();
+    private Sound backgroundMusic, titleScreenMusic;
     private BufferedImage gameBackground, titleSrn1, titleSrn2, howToPlay, endingSrn1, endingSrn2, topBar;
     private BufferedImage number1, number2, number3, number4, number5, number6, number7, number8, number9, number0;
     private BufferedImage newBarricade, damagedBarricade, brokenBarricade;
@@ -47,9 +48,9 @@ public class GamePanel extends JPanel implements Runnable {
 
 
     public GamePanel() {
-        this.setPreferredSize(new Dimension(screenWidth, screenHeight));
+        this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setDoubleBuffered(true);
-        this.addKeyListener(keyH);
+        this.addKeyListener(KEY_H);
         this.setFocusable(true);
         this.setBackground(new Color(0, 199, 255));
         setValues();
@@ -62,6 +63,9 @@ public class GamePanel extends JPanel implements Runnable {
         titleScreenState = "option 1";
         backgroundState = "title screen";
         highScore = getHighScore();
+        backgroundMusic = new Sound("/Users/walford/IdeaProjects/CastleWallDefense/assets/Sounds/backgroundMusic.wav");
+        titleScreenMusic = new Sound("/Users/walford/IdeaProjects/CastleWallDefense/assets/Sounds/titleScreenMusic.wav");
+        titleScreenMusic.playLooped();
 
         try {
             gameBackground = ImageIO.read(getClass().getResourceAsStream("/Background/Background.png"));
@@ -99,7 +103,7 @@ public class GamePanel extends JPanel implements Runnable {
         barricadeHealth = 100;
         killCount = 0;
         killsUntilSpeedBuff = 10;
-        p = new Player(99, tileSize * 2 + 72, tileSize, keyH);
+        p = new Player(99, TILE_SIZE * 2 + 72, TILE_SIZE, KEY_H);
     }
 
     public void startGameThread() {
@@ -113,14 +117,14 @@ public class GamePanel extends JPanel implements Runnable {
             frameCount++;
 
             if (frameCount >= enemyCooldown) {
-                int x = maxScreenCol * tileSize;
+                int x = MAX_SCREEN_COL * TILE_SIZE;
                 int i = (int) (Math.random() * yValues.length);
                 Enemy e = new Enemy(x, yValues[i], enemySpeed);
                 enemies.add(e);
                 frameCount = 0;
             }
 
-            if (keyH.isSpacePressed()) {
+            if (KEY_H.isSpacePressed()) {
                 boolean tooClose = false;
 
                 for (Arrow a : arrows) {
@@ -134,15 +138,9 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
 
-            //test code
-            if(keyH.isEnterPressed() && framesSinceLastEnter >= 60) {
-                framesSinceLastEnter = 0;
-                barricadeHealth = 0;
-            }
-
             for (int i = 0; i < arrows.size(); i++) {
                 Arrow a = arrows.get(i);
-                if (a.getX() > tileSize * maxScreenCol) {
+                if (a.getX() > TILE_SIZE * MAX_SCREEN_COL) {
                     arrows.remove(i);
                 } else {
                     a.moveForward();
@@ -192,6 +190,8 @@ public class GamePanel extends JPanel implements Runnable {
             if (barricadeHealth == 0) {
                 backgroundState = "ended";
                 framesSinceLastEnter = 0;
+                backgroundMusic.stopMusic();
+                titleScreenMusic.playLooped();
             }
         }
         else if (backgroundState.equals("title screen")) {
@@ -199,23 +199,25 @@ public class GamePanel extends JPanel implements Runnable {
 
             switch (titleScreenState) {
                 case "option 1":
-                    if (keyH.isDownPressed()) {
+                    if (KEY_H.isDownPressed()) {
                         titleScreenState = "option 2";
-                    } else if (keyH.isEnterPressed() && framesSinceLastEnter >= 30) {
+                    } else if (KEY_H.isEnterPressed() && framesSinceLastEnter >= 30) {
                         backgroundState = "playing";
                         framesSinceLastEnter = 0;
+                        titleScreenMusic.stopMusic();
+                        backgroundMusic.playLooped();
                     }
                     break;
                 case "option 2":
-                    if (keyH.isUpPressed()) {
+                    if (KEY_H.isUpPressed()) {
                         titleScreenState = "option 1";
-                    } else if (keyH.isEnterPressed() && framesSinceLastEnter >= 30) {
+                    } else if (KEY_H.isEnterPressed() && framesSinceLastEnter >= 30) {
                             titleScreenState = "how to play";
                             framesSinceLastEnter = 0;
                     }
                     break;
                 case "how to play":
-                    if (keyH.isEnterPressed() && framesSinceLastEnter >= 30) {
+                    if (KEY_H.isEnterPressed() && framesSinceLastEnter >= 30) {
                         titleScreenState = "option 2";
                         framesSinceLastEnter = 0;
                     }
@@ -224,7 +226,7 @@ public class GamePanel extends JPanel implements Runnable {
             framesSinceLastEnter++;
         }
         else if(backgroundState.equals("ended")) {
-            if(keyH.isEnterPressed() && framesSinceLastEnter >= 60) {
+            if(KEY_H.isEnterPressed() && framesSinceLastEnter >= 60) {
                 backgroundState = "title screen";
                 framesSinceLastEnter = 0;
             }
@@ -250,26 +252,26 @@ public class GamePanel extends JPanel implements Runnable {
                     break;
             }
 
-            graphics2D.drawImage(image, 0, 72, screenWidth, screenHeight-72, null);
+            graphics2D.drawImage(image, 0, 72, SCREEN_WIDTH, SCREEN_HEIGHT-72, null);
         }
         if(backgroundState.equals("ended")) {
             if(killCount < highScore) {
-                graphics2D.drawImage(endingSrn1, 0, 72, screenWidth, screenHeight-72, null);
+                graphics2D.drawImage(endingSrn1, 0, 72, SCREEN_WIDTH, SCREEN_HEIGHT-72, null);
             }
             else {
                 if(highScore != killCount) {
                     saveScore(killCount);
                 }
                 highScore = killCount;
-                graphics2D.drawImage(endingSrn2, 0, 72, screenWidth, screenHeight-72, null);
+                graphics2D.drawImage(endingSrn2, 0, 72, SCREEN_WIDTH, SCREEN_HEIGHT-72, null);
             }
 
             drawNumbers(graphics2D, 846, 477, killCount);
             drawNumbers(graphics2D,  837, 576, highScore);
         }
         if(backgroundState.equals("playing")) {
-            graphics2D.drawImage(gameBackground, 0, 72, tileSize * maxScreenCol, tileSize * maxScreenRow, null);
-            graphics2D.drawImage(topBar, 0,0, screenWidth, 72, null);
+            graphics2D.drawImage(gameBackground, 0, 72, TILE_SIZE * MAX_SCREEN_COL, TILE_SIZE * MAX_SCREEN_ROW, null);
+            graphics2D.drawImage(topBar, 0,0, SCREEN_WIDTH, 72, null);
 
             drawNumbers(graphics2D, 558, 9, barricadeHealth);
             drawNumbers(graphics2D, 1206, 9, killCount);
@@ -284,15 +286,15 @@ public class GamePanel extends JPanel implements Runnable {
             else if(barricadeHealth <= 100) {
                 barricade = newBarricade;
             }
-            graphics2D.drawImage(barricade, tileSize+32, 72, tileSize/2, screenHeight-72, null);
+            graphics2D.drawImage(barricade, TILE_SIZE+32, 72, TILE_SIZE/2, SCREEN_HEIGHT-72, null);
 
-            p.draw(graphics2D, tileSize);
+            p.draw(graphics2D, TILE_SIZE);
 
             for (Arrow a : arrows) {
-                a.draw(graphics2D, tileSize);
+                a.draw(graphics2D, TILE_SIZE);
             }
             for (Enemy e : enemies) {
-                e.draw(graphics2D, tileSize);
+                e.draw(graphics2D, TILE_SIZE);
             }
         }
         graphics2D.dispose();
