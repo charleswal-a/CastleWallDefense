@@ -39,7 +39,7 @@ Here are some of the features players can experience in the game:
 
 All project planning, programming, and debugging was done by me.
 
-Feel free to check out my [profile](github.com/charleswal-a)!
+Feel free to check out my [profile](http://github.com/charleswal-a)!
 
 ## Acknowledgments
 
