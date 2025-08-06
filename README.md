@@ -17,9 +17,7 @@
 
 Welcome to my Castle Wall Defense repository! :wave:
 
-This project is a game that I created for a 3-week long programming competition when I was a junior in high school. The competition was held through my AP Computer Science A course and included a presentation at the end. Since the end of the e
-
-I am very proud of this game as it was my first time planning and executing my own project. It even won first place in the class! :trophy:
+This project is a game that I created for a 3-week long programming competition when I was a junior in high school. The competition was held through my AP Computer Science A course and included a presentation at the end. I am very proud of this game as it was my first time planning and executing my own project. It even won first place in the class! :trophy:
 
 Enjoy playing this simple defense game that introduced me to the world of software development!
 
